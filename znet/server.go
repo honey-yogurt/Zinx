@@ -2,6 +2,7 @@ package znet
 
 import (
 	"fmt"
+	"github.com/honey-yogurt/Zinx/utils"
 	"github.com/honey-yogurt/Zinx/ziface"
 	"net"
 )
@@ -25,8 +26,8 @@ func NewServer(name string) ziface.IServer {
 	s := &Server{
 		Name:      name,
 		IPVersion: "tcp4",
-		IP:        "0.0.0.0",
-		Port:      7777,
+		IP:        utils.GlobalObject.Host,
+		Port:      utils.GlobalObject.TcpPort,
 		Router:    nil,
 	}
 	return s
