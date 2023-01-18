@@ -9,3 +9,7 @@ znet 模块是 zinx 框架中网络相关功能的实现，所有网络相关模
 # 简单的连接封装和业务绑定
 
 ![img.png](images/conn.png)
+
+# 基础 router 模块
+
+![img.png](images/request.png)
