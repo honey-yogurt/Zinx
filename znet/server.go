@@ -1,6 +1,7 @@
 package znet
 
 import (
+	"errors"
 	"fmt"
 	"github.com/honey-yogurt/Zinx/ziface"
 	"net"
@@ -49,7 +50,8 @@ func (s *Server) Start() {
 			return
 		}
 		fmt.Println("start Zinx server  ", s.Name, " success, now listening...")
-
+		var cid uint32
+		cid = 0
 		// 启动 server 网络连接服务
 		for {
 			// 阻塞,等待客户端建立连接请求
@@ -62,23 +64,10 @@ func (s *Server) Start() {
 
 			// TODO Server.Start() 处理该新连接请求的 业务 方法，此时应该有 handler 和 conn 是绑定的
 
-			// 我们这里暂时做一个最大512字节的回显服务
-			go func() {
-				// 不断的循环从客户端获取数据
-				for {
-					buf := make([]byte, 512)
-					cnt, err := conn.Read(buf)
-					if err != nil {
-						fmt.Println("recv buf err ", err)
-						continue
-					}
-					// 回显
-					if _, err := conn.Write(buf[:cnt]); err != nil {
-						fmt.Println("write back buf err ", err)
-						continue
-					}
-				}
-			}()
+			// 将处理新连接的业务方法和conn进行绑定，得到我们定义的连接模块
+			dealConn := NewConnection(conn, cid, CallBackToClient)
+			cid++
+			go dealConn.Start()
 		}
 	}()
 }
@@ -96,4 +85,16 @@ func (s *Server) Serve() {
 
 	// 阻塞，否则主 go 退出，listener 的 go 将会退出
 	select {}
+}
+
+// CallBackToClient 定义当前客户端连接所绑定的 handleAPI
+// (目前这个 handle 写死，以后应该由用户自定义)
+func CallBackToClient(conn *net.TCPConn, data []byte, cnt int) error {
+	// 回显的业务
+	fmt.Println("[Conn Handle] CallbackToClient ...")
+	if _, err := conn.Write(data[:cnt]); err != nil {
+		fmt.Println("write back buf err ", err)
+		return errors.New("CallBackToClient error")
+	}
+	return nil
 }
