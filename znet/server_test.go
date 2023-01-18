@@ -38,7 +38,7 @@ func ClientTest() {
 			fmt.Println("read buf error ")
 			return
 		}
-		fmt.Printf(" server call back : %s, cnt = %d\n", buf, cnt)
+		fmt.Printf(" server call back : %s, cnt = %d\n", buf[:cnt], cnt)
 
 		time.Sleep(1 * time.Second)
 	}

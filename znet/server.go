@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/honey-yogurt/Zinx/ziface"
 	"net"
-	"time"
 )
 
 // Server implement interface IServer
@@ -18,6 +17,19 @@ type Server struct {
 	// 服务绑定的 端口
 	Port int
 }
+
+// NewServer 创建一个服务器句柄
+func NewServer(name string) ziface.IServer {
+	s := &Server{
+		Name:      name,
+		IPVersion: "tcp4",
+		IP:        "0.0.0.0",
+		Port:      7777,
+	}
+	return s
+}
+
+var _ ziface.IServer = &Server{}
 
 func (s *Server) Start() {
 	fmt.Printf("[START] Server listener at IP: %s, Port %d, is starting\n", s.IP, s.Port)
@@ -36,7 +48,7 @@ func (s *Server) Start() {
 			fmt.Println("listen", s.IPVersion, "err", err)
 			return
 		}
-		fmt.Println("start Zinx server  ", s.Name, " succ, now listenning...")
+		fmt.Println("start Zinx server  ", s.Name, " success, now listening...")
 
 		// 启动 server 网络连接服务
 		for {
@@ -78,24 +90,10 @@ func (s *Server) Stop() {
 }
 
 func (s *Server) Serve() {
+	// 在 start 中阻塞的话，serve 就没有用了
 	s.Start()
 	//TODO Server.Serve() 是否在启动服务的时候 还要处理其他的事情呢 可以在这里添加
 
 	// 阻塞，否则主 go 退出，listener 的 go 将会退出
-	for {
-		time.Sleep(10 * time.Second)
-	}
-}
-
-var _ ziface.IServer = &Server{}
-
-// NewServer 创建一个服务器句柄
-func NewServer(name string) ziface.IServer {
-	s := &Server{
-		Name:      name,
-		IPVersion: "tcp4",
-		IP:        "0.0.0.0",
-		Port:      7777,
-	}
-	return s
+	select {}
 }

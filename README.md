@@ -5,3 +5,7 @@ ziface 主要是存放一些 Zinx 框架的全部模块的抽象层接口类，Z
 znet 模块是 zinx 框架中网络相关功能的实现，所有网络相关模块都会定义在 znet 模块中。
 
 ![img.png](images/basic_server.png)
+
+# 简单的连接封装和业务绑定
+
+![img.png](images/conn.png)
