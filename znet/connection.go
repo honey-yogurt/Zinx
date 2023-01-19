@@ -46,8 +46,10 @@ func (c *Connection) Start() {
 	fmt.Println("Conn Start()... ConnId = ", c.ConnID)
 	// 启动从当前连接读数据的业务
 	go c.StartReader()
-
+	// 启动从当前连接写数据的业务
 	go c.StartWriter()
+	// 执行开发者注册的 OnConnStart 钩子函数
+	c.TcpServer.CallOnConnStart(c)
 }
 
 func (c *Connection) Stop() {
@@ -56,6 +58,8 @@ func (c *Connection) Stop() {
 		return
 	}
 	c.isClosed = true
+	// 调用开发者注册的 OnConnStop 钩子函数
+	c.TcpServer.CallOnConnStop(c)
 	// 关闭socket连接
 	c.Conn.Close()
 	// 告知 Writer 关闭
