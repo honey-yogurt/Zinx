@@ -20,3 +20,8 @@ znet 模块是 zinx 框架中网络相关功能的实现，所有网络相关模
 
 # 全局配置
 ![img.png](images/config.png)
+
+# 消息封装
+![img.png](images/message.png)
+
+![img.png](images/package.png)

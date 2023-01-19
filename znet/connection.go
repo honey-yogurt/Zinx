@@ -2,6 +2,7 @@ package znet
 
 import (
 	"fmt"
+	"github.com/honey-yogurt/Zinx/utils"
 	"github.com/honey-yogurt/Zinx/ziface"
 	"net"
 )
@@ -74,8 +75,8 @@ func (c *Connection) StartReader() {
 	defer fmt.Println("connID = ", c.ConnID, ", Reader is exit, remote addr is ", c.RemoteAddr().String())
 	defer c.Stop()
 	for {
-		// 读取客户端的数据到 buf 中，最大 512 字节
-		buf := make([]byte, 512)
+		// 读取客户端的数据到 buf 中
+		buf := make([]byte, utils.GlobalObject.MaxPackageSize)
 		_, err := c.Conn.Read(buf)
 		if err != nil {
 			fmt.Println("recv buf error ", err)
