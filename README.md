@@ -36,3 +36,10 @@ znet 模块是 zinx 框架中网络相关功能的实现，所有网络相关模
 # 读写分离
 ![img.png](images/arti.png)
 ![img.png](images/read_write.png)
+
+# 消息队列和多任务机制
+![img.png](images/arti_worker.png)
+![img.png](images/create_queue.png)
+![img.png](images/workpool.png)
+![img.png](images/msgTaskQueue.png)
+![img.png](images/integrate_workpool.png)
