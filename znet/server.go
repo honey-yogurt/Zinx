@@ -19,6 +19,8 @@ type Server struct {
 	Port int
 	// 当前 server 的消息管理模块，用来绑定 MsgID 和对应的处理业务 API 关系
 	MsgHandler ziface.IMsgHandle
+	// 连接管理器
+	ConnMgr ziface.IConnManager
 }
 
 // NewServer 创建一个服务器句柄
@@ -29,6 +31,7 @@ func NewServer(name string) ziface.IServer {
 		IP:         utils.GlobalObject.Host,
 		Port:       utils.GlobalObject.TcpPort,
 		MsgHandler: NewMsgHandle(),
+		ConnMgr:    NewConnManager(),
 	}
 	return s
 }
@@ -65,8 +68,14 @@ func (s *Server) Start() {
 				fmt.Println("Accept err ", err)
 				continue
 			}
-			// TODO Server.Start() 设置服务器最大连接控制，如果超过最大连接，那么则关闭新的连接
-
+			//  设置服务器最大连接控制,如果超过最大连接，那么则关闭此新的连接
+			fmt.Println(">>>>>>ConnMgr Len = ", s.ConnMgr.Len(), ", MAX = ", utils.GlobalObject.MaxConn)
+			if s.ConnMgr.Len() >= utils.GlobalObject.MaxConn {
+				// TODO 给客户端响应一个超出最大连接的错误包
+				fmt.Println("====> Too Many Connections MaxConn = ", utils.GlobalObject.MaxConn)
+				conn.Close()
+				continue
+			}
 			// TODO Server.Start() 处理该新连接请求的 业务 方法，此时应该有 handler 和 conn 是绑定的
 
 			// 将处理新连接的业务方法和conn进行绑定，得到我们定义的连接模块
@@ -78,9 +87,8 @@ func (s *Server) Start() {
 }
 
 func (s *Server) Stop() {
-	fmt.Println("[STOP] Zinx server , name ", s.Name)
-
-	//TODO  Server.Stop() 将其他需要清理的连接信息或者其他信息 也要一并停止或者清理
+	// 将一些服务器的资源、状态、或者 已经开辟的连接信息进行停止或回收
+	s.ConnMgr.ClearConn()
 }
 
 func (s *Server) Serve() {
@@ -94,4 +102,8 @@ func (s *Server) Serve() {
 
 func (s *Server) AddRouter(msgID uint32, router ziface.IRouter) {
 	s.MsgHandler.AddRouter(msgID, router)
+}
+
+func (s *Server) GetConnMgr() ziface.IConnManager {
+	return s.ConnMgr
 }
