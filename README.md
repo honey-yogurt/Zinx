@@ -49,3 +49,6 @@ znet 模块是 zinx 框架中网络相关功能的实现，所有网络相关模
 ![img.png](images/connManager.png)
 ![img.png](images/integrate_connManager.png)
 ![img.png](images/hook.png)
+
+# 连接属性配置
+![img.png](images/conn_config.png)

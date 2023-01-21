@@ -30,7 +30,7 @@ var GlobalObject *GlobalObj
 func init() {
 	GlobalObject = &GlobalObj{
 		Name:             "ZinxServerApp",
-		Version:          "V0.9",
+		Version:          "V1.0",
 		TcpPort:          7777,
 		Host:             "0.0.0.0",
 		MaxConn:          1000,

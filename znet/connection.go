@@ -7,6 +7,7 @@ import (
 	"github.com/honey-yogurt/Zinx/ziface"
 	"io"
 	"net"
+	"sync"
 )
 
 type Connection struct {
@@ -24,6 +25,10 @@ type Connection struct {
 	msgChan chan []byte
 	// 消息的管理 MsgID 和对应处理业务 API 关系
 	MsgHandler ziface.IMsgHandle
+	// 连接属性集合
+	property map[string]interface{}
+	// 保护连接属性的锁
+	propertyLock sync.RWMutex
 }
 
 var _ ziface.IConnection = (*Connection)(nil)
@@ -36,6 +41,7 @@ func NewConnection(conn *net.TCPConn, connID uint32, msgHandler ziface.IMsgHandl
 		MsgHandler: msgHandler,
 		msgChan:    make(chan []byte),
 		ExitChan:   make(chan bool, 1),
+		property:   make(map[string]interface{}),
 	}
 	// 将 conn 加入到 ConnManager 中
 	c.TcpServer.GetConnMgr().Add(c)
@@ -99,6 +105,33 @@ func (c *Connection) SendMsg(msgId uint32, data []byte) error {
 	// 读写分离：将数据发送给消息管道
 	c.msgChan <- binaryMsg
 	return nil
+}
+
+func (c *Connection) SetProperty(key string, value interface{}) {
+	c.propertyLock.Lock()
+	defer c.propertyLock.Unlock()
+
+	// 添加一个连接属性
+	c.property[key] = value
+}
+
+func (c *Connection) GetProperty(key string) (interface{}, error) {
+	c.propertyLock.RLock()
+	defer c.propertyLock.RUnlock()
+
+	if value, ok := c.property[key]; ok {
+		return value, nil
+	} else {
+		return nil, errors.New("no property FOUND")
+	}
+}
+
+func (c *Connection) RemoveProperty(key string) {
+	c.propertyLock.Lock()
+	defer c.propertyLock.Unlock()
+
+	// 删除属性
+	delete(c.property, key)
 }
 
 // StartReader 连接的读业务方法

@@ -42,17 +42,25 @@ func DoConnectionBegin(conn ziface.IConnection) {
 	if err := conn.SendMsg(202, []byte("DoConnection BEGIN!")); err != nil {
 		fmt.Println(err)
 	}
+	// 给当前的一些连接设置属性
+	conn.SetProperty("name", "honey-yogurt")
 }
 
 // DoConnectionLost 连接断开前执行的钩子函数
 func DoConnectionLost(conn ziface.IConnection) {
 	fmt.Println("====> DoConnectionLost is Called...")
 	fmt.Println("conn ID = ", conn.GetConnID(), " is Lost...")
+
+	// 获取连接属性
+	if name, err := conn.GetProperty("name"); err == nil {
+		fmt.Println("name", name)
+	}
+
 }
 
 func main() {
 	// 1 创建一个server句柄, 使用Zinx的api
-	s := znet.NewServer("[Zinx V0.9]")
+	s := znet.NewServer("[Zinx V1.0]")
 	// 2 注册连接 Hook 钩子函数
 	s.SetOnConnStart(DoConnectionBegin)
 	s.SetOnConnStop(DoConnectionLost)
